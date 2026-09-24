@@ -1,0 +1,785 @@
+<title>Гитарный шаг</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#EDF0EB; --surface:#FAFBF8; --soft:#E2E7E1; --ink:#19201D; --muted:#5B6862; --line:#CFD7D1;
+  --accent:#9C6A12; --accent-soft:#F1E2C4; --accent-ink:#FFFFFF; --steel:#2C6862;
+  --good:#2D7A4C; --bad:#B0422E; --neck:#3A2A22; --neck-line:#8E8474; --inlay:#E9C77B;
+  --display:"Unbounded", "Segoe UI", system-ui, sans-serif;
+  --body:"Manrope", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1513; --surface:#172020; --soft:#1F2927; --ink:#E3EAE5; --muted:#97A49E; --line:#2A3632;
+    --accent:#E2AF52; --accent-soft:#3A2F1A; --accent-ink:#1A1408; --steel:#71B7AF;
+    --good:#5DC487; --bad:#E77B63; --neck:#2B1F19; --neck-line:#6E665A; --inlay:#E2AF52;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1513; --surface:#172020; --soft:#1F2927; --ink:#E3EAE5; --muted:#97A49E; --line:#2A3632;
+  --accent:#E2AF52; --accent-soft:#3A2F1A; --accent-ink:#1A1408; --steel:#71B7AF;
+  --good:#5DC487; --bad:#E77B63; --neck:#2B1F19; --neck-line:#6E665A; --inlay:#E2AF52;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 96px}
+.wrap{max-width:640px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0;letter-spacing:-.01em}
+h1{font-size:20px}
+h2{font-size:17px}
+h3{font-size:14px;font-weight:500}
+p{margin:0}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.muted{color:var(--muted)}
+.label{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* header */
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:18px 10px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{flex:none}
+.sync{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync i{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block}
+.sync.cloud i{background:var(--good)}
+
+/* week neck */
+.neck{background:var(--neck);border-radius:6px 14px 14px 6px;padding:14px 10px 10px 18px;position:relative;color:#EDE6DA;border-left:6px solid #D9D2C3}
+.neck-frets{display:grid;grid-template-columns:repeat(7,1fr);position:relative}
+.fret{height:54px;border-right:3px solid var(--neck-line);display:flex;align-items:center;justify-content:center;position:relative}
+.fret::before{content:"";position:absolute;left:-4px;right:0;top:50%;height:1px;background:rgba(237,230,218,.14);box-shadow:0 -14px 0 rgba(237,230,218,.14),0 14px 0 rgba(237,230,218,.14)}
+.inlay{width:18px;height:18px;border-radius:50%;border:2px dashed rgba(237,230,218,.3);position:relative;z-index:1}
+.inlay.on{background:var(--inlay);border:0;box-shadow:0 0 0 4px rgba(233,199,123,.18)}
+.inlay.today{border:2px solid var(--inlay)}
+.neck-days{display:grid;grid-template-columns:repeat(7,1fr);font-size:11px;text-align:center;margin-top:6px;color:#BFB6A6;font-weight:600}
+.neck-days .t{color:var(--inlay)}
+.week-line{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.week-line b{font-family:var(--display);font-size:22px;font-weight:700}
+
+/* segmented */
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--soft);border-radius:12px;padding:4px;gap:4px}
+.seg button{padding:10px 8px;border-radius:9px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;align-items:center;line-height:1.25}
+.seg button small{font-weight:400;font-size:12px}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px}
+.plan{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.plan li{display:flex;justify-content:space-between;gap:12px;padding-block:9px;border-bottom:1px dashed var(--line)}
+.plan li:last-child{border-bottom:0}
+.plan li span:last-child{color:var(--muted);font-family:var(--mono);font-size:13px;white-space:nowrap}
+.btn{background:var(--accent);color:var(--accent-ink);font-weight:700;border-radius:12px;padding:13px 18px;text-align:center}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.small{padding:8px 12px;font-size:14px;border-radius:10px}
+.btn:disabled{opacity:.45;cursor:default}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns .btn{flex:1 1 180px}
+.done-note{background:var(--accent-soft);border-radius:12px;padding:10px 14px;font-size:14px}
+.anchor{display:flex;gap:8px;align-items:center;font-size:14px}
+.anchor input{flex:1;min-width:0;background:transparent;border:0;border-bottom:1.5px dashed var(--line);font:inherit;color:var(--ink);padding:4px 2px}
+details.how summary{cursor:pointer;font-weight:700;list-style:none}
+details.how summary::after{content:" +";color:var(--muted)}
+details.how[open] summary::after{content:" −"}
+details.how ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--ink)}
+
+/* nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:10}
+nav.tabs .in{max-width:640px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+nav.tabs button{padding:8px 4px;border-radius:10px;font-size:12px;font-weight:700;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav.tabs button svg{width:22px;height:22px}
+nav.tabs button.on{color:var(--accent);background:var(--accent-soft)}
+
+/* chord diagram */
+.cd{display:block;width:100%;max-width:112px;height:auto}
+.cd-l{max-width:170px}
+.cd .nut{stroke:var(--ink);stroke-width:4}
+.cd .fr{stroke:var(--line);stroke-width:1.5}
+.cd .st{stroke:var(--muted)}
+.cd .dot{fill:var(--ink)}
+.cd .fg{fill:var(--surface);font-size:9px;text-anchor:middle;font-weight:700;font-family:var(--body)}
+.cd .mk{fill:var(--muted);text-anchor:middle;font-size:12px;font-family:var(--body)}
+.cd .op{fill:none;stroke:var(--muted);stroke-width:1.5}
+.chords{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.chord{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.chord.locked{opacity:.55}
+.chord .nm{font-family:var(--display);font-size:18px;font-weight:700}
+.chord .ru{font-size:12px;color:var(--muted);line-height:1.3}
+.pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--soft);color:var(--muted)}
+.pill.acc{background:var(--accent-soft);color:var(--accent)}
+
+/* path */
+.stages{display:flex;flex-direction:column;gap:0;position:relative}
+.stage{display:grid;grid-template-columns:40px 1fr;gap:12px;padding-block:12px;border-bottom:1px solid var(--line)}
+.stage .num{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;background:var(--soft);color:var(--muted)}
+.stage.past .num{background:var(--steel);color:var(--surface)}
+.stage.cur .num{background:var(--accent);color:var(--accent-ink)}
+.stage .t{font-weight:700}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.chips span{font-family:var(--mono);font-size:12px;padding:1px 7px;border:1px solid var(--line);border-radius:6px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+.stat b{display:block;font-family:var(--display);font-size:22px}
+.stat span{font-size:12px;color:var(--muted)}
+.bars{display:flex;align-items:flex-end;gap:4px;height:70px;border-bottom:1px solid var(--line)}
+.bars div{flex:1;background:var(--steel);border-radius:3px 3px 0 0;min-height:3px;position:relative}
+.bars div.best{background:var(--accent)}
+.goalline{position:relative}
+.goalline::after{content:"";position:absolute;left:0;right:0;border-top:1.5px dashed var(--accent);bottom:var(--g)}
+
+/* tools */
+.strings{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.strings button{background:var(--soft);border-radius:10px;padding:10px 2px;display:flex;flex-direction:column;align-items:center}
+.strings button b{font-family:var(--display);font-size:18px}
+.strings button small{font-size:11px;color:var(--muted)}
+.strings button.on{background:var(--accent);color:var(--accent-ink)}
+.strings button.on small{color:var(--accent-ink)}
+.metro{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.metro .bpm{font-family:var(--mono);font-size:20px;font-weight:600;min-width:44px;text-align:center}
+.rbtn{width:38px;height:38px;border-radius:10px;background:var(--soft);font-weight:700;font-size:18px}
+.beats{display:flex;gap:8px}
+.beats i{width:14px;height:14px;border-radius:50%;background:var(--soft);display:block}
+.beats i.on{background:var(--accent)}
+.goals{display:flex;gap:6px}
+.goals button{min-width:44px;padding:8px 10px;border-radius:10px;background:var(--soft);font-weight:700;font-family:var(--mono)}
+.goals button.on{background:var(--ink);color:var(--bg)}
+.danger{color:var(--bad)}
+
+/* session */
+#session{position:fixed;inset:0;background:var(--bg);z-index:30;overflow:auto;padding:env(safe-area-inset-top,0px) 16px calc(24px + env(safe-area-inset-bottom,0px))}
+#session .wrap{display:flex;flex-direction:column;gap:16px;padding-top:14px}
+.shead{display:flex;align-items:center;gap:12px}
+.shead .x{width:38px;height:38px;border-radius:10px;background:var(--soft);font-size:20px;flex:none}
+.prog{flex:1;display:flex;gap:4px}
+.prog i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.prog i.on{background:var(--accent)}
+.timer{height:6px;background:var(--soft);border-radius:3px;overflow:hidden}
+.timer i{display:block;height:100%;background:var(--steel);width:0%;transition:width .25s linear}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.pair{display:flex;gap:10px;justify-content:center;align-items:flex-start}
+.pair>div{flex:1;max-width:170px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.big{font-family:var(--display);font-size:56px;font-weight:700;text-align:center;line-height:1}
+.tap{width:100%;min-height:150px;border-radius:20px;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-size:22px;font-weight:700;touch-action:manipulation;user-select:none}
+.tap:active{transform:scale(.985)}
+.pattern{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;text-align:center}
+.pattern div{border-radius:10px;background:var(--soft);padding:10px 0 6px;display:flex;flex-direction:column;gap:2px;transition:background .08s}
+.pattern div b{font-size:24px;line-height:1}
+.pattern div small{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.pattern div.rest b{color:var(--line)}
+.pattern div.on{background:var(--accent);color:var(--accent-ink)}
+.pattern div.on small{color:var(--accent-ink)}
+.progc{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.progc span{font-family:var(--display);font-weight:700;padding:8px 14px;border-radius:10px;background:var(--soft);font-size:16px}
+.progc span.on{background:var(--accent);color:var(--accent-ink)}
+.tab{font-family:var(--mono);font-size:13px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;overflow-x:auto;white-space:pre;line-height:1.45}
+.lesson{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--steel);border-radius:6px 14px 14px 6px;padding:16px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opts button{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:14px 10px;font-weight:700;font-size:16px}
+.opts button.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 16%,var(--surface))}
+.opts button.no{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+.board{width:100%;max-width:420px;height:auto;display:block;margin:0 auto}
+.board .str{stroke:var(--muted)}
+.board .frl{stroke:var(--line);stroke-width:2}
+.board .nutl{stroke:var(--ink);stroke-width:5}
+.board .lab{fill:var(--muted);font-size:11px;font-family:var(--mono);text-anchor:middle}
+.board .inl{fill:var(--line)}
+.board .hit{fill:var(--accent)}
+.feel{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.feel button{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 6px;font-weight:700}
+.feel button.on{border-color:var(--accent);background:var(--accent-soft)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;z-index:40;max-width:calc(100% - 32px)}
+.confirm{background:color-mix(in srgb,var(--bad) 10%,var(--surface));border:1px solid var(--bad);border-radius:12px;padding:12px}
+@media (min-width:700px){ body{font-size:16px} h1{font-size:22px} }
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+
+<div class="wrap" id="app">
+  <header class="top">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="2" y="6" width="26" height="18" rx="3" fill="var(--neck)"/><g stroke="#D9D2C3" stroke-width="1"><line x1="2" y1="10" x2="28" y2="10"/><line x1="2" y1="13.5" x2="28" y2="13.5"/><line x1="2" y1="17" x2="28" y2="17"/><line x1="2" y1="20.5" x2="28" y2="20.5"/></g><circle cx="17" cy="15" r="3" fill="var(--inlay)"/></svg>
+      <h1>Гитарный шаг</h1>
+    </div>
+    <div class="sync" id="sync"><i></i><span>на этом устройстве</span></div>
+  </header>
+  <main id="view"></main>
+</div>
+<nav class="tabs" aria-label="Разделы"><div class="in" id="tabs"></div></nav>
+<div id="session" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+/* ---------- музыкальные данные ---------- */
+const OPEN=[82.41,110,146.83,196,246.94,329.63];          // 6-я … 1-я струна
+const STR=['E','A','D','G','B','E'];
+const OPEN_IDX=[4,9,2,7,11,4];
+const NOTES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const RU={C:'до','C#':'до-диез',D:'ре','D#':'ре-диез',E:'ми',F:'фа','F#':'фа-диез',G:'соль','G#':'соль-диез',A:'ля','A#':'ля-диез',B:'си'};
+const CHORDS={
+  Em:{f:[0,2,2,0,0,0],fg:[0,2,3,0,0,0],t:'min',ru:'ми минор'},
+  Am:{f:[-1,0,2,2,1,0],fg:[0,0,2,3,1,0],t:'min',ru:'ля минор'},
+  E:{f:[0,2,2,1,0,0],fg:[0,2,3,1,0,0],t:'maj',ru:'ми мажор'},
+  D:{f:[-1,-1,0,2,3,2],fg:[0,0,0,1,3,2],t:'maj',ru:'ре мажор'},
+  A:{f:[-1,0,2,2,2,0],fg:[0,0,1,2,3,0],t:'maj',ru:'ля мажор'},
+  G:{f:[3,2,0,0,0,3],fg:[2,1,0,0,0,3],t:'maj',ru:'соль мажор'},
+  C:{f:[-1,3,2,0,1,0],fg:[0,3,2,0,1,0],t:'maj',ru:'до мажор'},
+  Dm:{f:[-1,-1,0,2,3,1],fg:[0,0,0,2,3,1],t:'min',ru:'ре минор'},
+  Fmaj7:{f:[-1,-1,3,2,1,0],fg:[0,0,3,2,1,0],t:'maj',ru:'лёгкий фа'},
+  E5:{f:[0,2,2,-1,-1,-1],fg:[0,1,2,0,0,0],t:'5',ru:'пауэр-аккорд ми'},
+  A5:{f:[-1,0,2,2,-1,-1],fg:[0,0,1,2,0,0],t:'5',ru:'пауэр-аккорд ля'}
+};
+const PATS=[
+  {name:'Четыре вниз',s:'D-D-D-D-'},
+  {name:'Вниз, вниз-вверх',s:'D-DUD-DU'},
+  {name:'Народный бой',s:'D-DU-UDU'},
+  {name:'Бой с глушением',s:'D-XUD-XU'}
+];
+const STAGES=[
+  {title:'Первый аккорд',chords:['Em'],pair:['Em','Em'],prog:['Em'],pat:0,bpm:60,warm:'open',lessons:['strings','fingers','press']},
+  {title:'Два минора',chords:['Am'],pair:['Em','Am'],prog:['Em','Am'],pat:0,bpm:60,warm:'open',lessons:['chord','alphabet']},
+  {title:'Первая связка',chords:['E'],pair:['Am','E'],prog:['Am','E'],pat:1,bpm:65,warm:'chrom',lessons:['changes','tab']},
+  {title:'Ре мажор',chords:['D'],pair:['Am','D'],prog:['Am','D','Em','Em'],pat:1,bpm:65,warm:'chrom',lessons:['rhythm']},
+  {title:'Три главных аккорда',chords:['A'],pair:['A','D'],prog:['A','D','E','A'],pat:1,bpm:70,warm:'chrom',lessons:['keys']},
+  {title:'Соль мажор',chords:['G'],pair:['G','D'],prog:['Em','G','D','A'],pat:2,bpm:70,warm:'chrom',lessons:[]},
+  {title:'Четыре аккорда',chords:['C'],pair:['C','G'],prog:['G','D','Em','C'],pat:2,bpm:75,warm:'chrom',lessons:[]},
+  {title:'Дворовый минор',chords:['Dm'],pair:['Dm','Am'],prog:['Am','Dm','E','Am'],pat:3,bpm:75,warm:'chrom',lessons:['mute']},
+  {title:'Лёгкий фа',chords:['Fmaj7'],pair:['Fmaj7','C'],prog:['C','Am','Fmaj7','G'],pat:2,bpm:80,warm:'chrom',lessons:['fmaj7']},
+  {title:'Пауэр-аккорды и соло',chords:['E5','A5'],pair:['E5','A5'],prog:['E5','A5','E5','A5'],pat:3,bpm:80,warm:'penta',lessons:['power','penta']}
+];
+const LESSONS={
+  strings:{t:'Как зовут струны',b:'Струны нумеруют от тонкой к толстой: 1-я — самая тонкая, 6-я — самая толстая. Названия с 6-й по 1-ю: <b>E A D G B E</b> (ми, ля, ре, соль, си, ми). Запоминалка: «<b>Е</b>нот <b>А</b>нанас <b>Д</b>олго <b>Г</b>рыз, <b>Б</b>егемот <b>Е</b>л».'},
+  fingers:{t:'Пальцы и схемы аккордов',b:'Пальцы левой руки: 1 — указательный, 2 — средний, 3 — безымянный, 4 — мизинец. На схеме аккорда вертикальные линии — струны (слева толстая 6-я), горизонтальные — лады. Цифра в кружке — какой палец ставить, <b>o</b> — струна звучит открытой, <b>×</b> — её не играем.'},
+  press:{t:'Как прижимать струну',b:'Ставь палец кончиком, почти вертикально, ближе к металлической полоске (ладовому порожку) справа. Давить — ровно настолько, чтобы не дребезжало. Кончики пальцев будут побаливать 1–2 недели: лучше по 10 минут каждый день, чем час раз в неделю.'},
+  chord:{t:'Что такое аккорд',b:'Аккорд — три и больше нот одновременно. <b>Мажор</b> звучит светло, <b>минор</b> — грустнее. Буква — главная нота: <b>A</b> — ля мажор, <b>Am</b> — ля минор (m = minor).'},
+  alphabet:{t:'Ноты на грифе',b:'Нот всего 12. Буквы: A B C D E F G = ля, си, до, ре, ми, фа, соль. Между соседними есть «диез» (#) — <b>кроме пар B–C и E–F</b>. Один лад = один шаг. Пример на 6-й струне: открытая — E, 1-й лад — F, 3-й — G, 5-й — A.'},
+  changes:{t:'Секрет быстрых смен',b:'Главный навык новичка — переставлять аккорды без пауз. Упражнение «минута смен»: 60 секунд туда-обратно, считаешь смены. 30 в минуту — уже можно играть песни. Ищи общий палец: он не отрывается от струны и служит якорем.'},
+  tab:{t:'Как читать табулатуру',b:'Табулатура — 6 линий, это 6 струн. <b>Верхняя линия — тонкая 1-я</b>. Цифра — номер лада, 0 — открытая струна. Читаем слева направо, как текст.'},
+  rhythm:{t:'Рука-маятник',b:'Считай «1 и 2 и 3 и 4 и». На цифры — удар вниз, на «и» — вверх. Правая рука качается постоянно, даже когда не задевает струны: так ритм не сбивается.'},
+  keys:{t:'Тональность и каподастр',b:'Тональность — «домашняя» нота песни. Каподастр — зажим на гриф: он сдвигает всё звучание выше, а аппликатуры остаются те же. Так песню подгоняют под свой голос.'},
+  mute:{t:'Глушение',b:'× в схеме боя — удар вниз с глушением: бьёшь по струнам и сразу кладёшь на них ребро правой ладони. Получается щелчок, похожий на малый барабан, — основа дворового боя.'},
+  fmaj7:{t:'Лёгкий фа',b:'Настоящий F — баррэ, это сложно для новичка. <b>Fmaj7</b> — мягкая замена: форма почти как у C, только сдвинута на одну струну. Звучит красиво и открывает сотни песен.'},
+  power:{t:'Пауэр-аккорды',b:'Пауэр-аккорд (E5, A5) — всего 2–3 ноты: основа и квинта. Ни мажор, ни минор — нейтрально и мощно, это звук рока. Играй только нижние струны, остальные не задевай.'},
+  penta:{t:'Пентатоника',b:'Пентатоника — 5 нот, которые почти всегда звучат хорошо. Ля-минорная «коробочка» на 5-м ладу — первая точка для импровизации. Играй её поверх Am или Em — фальшивых нот не будет.'}
+};
+const STATIC_Q=[
+  {s:1,q:'1-я струна — самая тонкая?',a:'Да',o:['Да','Нет']},
+  {s:1,q:'Какой палец обозначают цифрой 1?',a:'Указательный',o:['Большой','Указательный','Мизинец','Средний']},
+  {s:1,q:'Что значит «×» над струной на схеме?',a:'Не играть её',o:['Открытая струна','Не играть её','Баррэ','Прижать мизинцем']},
+  {s:1,q:'Где ставить палец на ладу?',a:'Ближе к правому порожку',o:['Ближе к правому порожку','Ровно посередине','Ближе к левому порожку']},
+  {s:2,q:'Am — это…',a:'ля минор',o:['ля мажор','ля минор','ми минор','ре минор']},
+  {s:2,q:'Между какими нотами нет диеза?',a:'B и C',o:['A и B','B и C','C и D','G и A']},
+  {s:3,q:'Верхняя линия табулатуры — это…',a:'1-я (тонкая) струна',o:['1-я (тонкая) струна','6-я (толстая) струна']},
+  {s:3,q:'Сколько смен в минуту уже хватает для песен?',a:'около 30',o:['около 5','около 30','больше 100']},
+  {s:4,q:'На «и» в счёте «1 и 2 и» рука идёт…',a:'вверх',o:['вниз','вверх']},
+  {s:5,q:'Зачем нужен каподастр?',a:'Сдвинуть тональность',o:['Настроить гитару','Сдвинуть тональность','Заглушить струны']},
+  {s:8,q:'«×» в схеме боя означает…',a:'удар с глушением',o:['пропуск','удар с глушением','удар вверх']},
+  {s:9,q:'Чем Fmaj7 удобнее F?',a:'Не нужно баррэ',o:['Он громче','Не нужно баррэ','Меньше пальцев']},
+  {s:10,q:'Сколько нот в пентатонике?',a:'5',o:['5','7','12']}
+];
+const WARM={
+  open:{t:'Открытые струны',b:'По 4 удара на каждую струну, от 6-й к 1-й и обратно. Называй вслух: E, A, D, G, B, E. Бей медиатором или большим пальцем, ровно под метроном.',tab:''},
+  chrom:{t:'Хроматика 1-2-3-4',b:'Лад = палец: 1-й лад — указательный, 2-й — средний и так далее. Сыграй на 6-й струне, затем на 5-й, 4-й… до 1-й. Одна нота на щелчок.',tab:'e|---------------|\nB|---------------|\nG|---------------|\nD|---------------|\nA|---------------|\nE|-1--2--3--4----|'},
+  penta:{t:'Пентатоника ля минор',b:'5-й лад — указательный палец, 7-й — безымянный, 8-й — мизинец. Вверх и вниз, одна нота на щелчок.',tab:'e|--------------------5-8---|\nB|----------------5-8-------|\nG|------------5-7-----------|\nD|--------5-7---------------|\nA|----5-7-------------------|\nE|5-8-----------------------|'}
+};
+const CHANGE_GOAL=25;
+
+/* ---------- состояние и синхронизация ---------- */
+const LS='guitar-step-v1';
+const def=()=>({v:1,stage:1,goal:4,anchor:'',mode:'guitar',days:{},changes:{},quiz:{ok:0,total:0},seen:[],updatedAt:0});
+const S={data:def(),view:'today',sync:'local',ref:null,sess:null,confirmReset:false};
+try{const raw=localStorage.getItem(LS); if(raw) S.data=Object.assign(def(),JSON.parse(raw));}catch(e){}
+
+let saveTimer=null,saving=false,dirty=false;
+function save(){
+  S.data.updatedAt=Date.now();
+  try{localStorage.setItem(LS,JSON.stringify(S.data));}catch(e){}
+  if(S.ref){clearTimeout(saveTimer);saveTimer=setTimeout(flush,700);}
+}
+async function flush(){
+  if(!S.ref) return;
+  if(saving){dirty=true;return;}
+  saving=true;
+  try{await S.ref.set(JSON.parse(JSON.stringify(S.data)));S.sync='cloud';}
+  catch(e){ if(e&&e.code==='unavailable'){setTimeout(flush,1500+Math.random()*1000);} else {S.sync='local';} }
+  saving=false;
+  if(dirty){dirty=false;flush();}
+  renderSync();
+}
+async function pullRemote(){
+  if(!S.ref||saving) return;
+  try{
+    const snap=await S.ref.get();
+    const remote=snap.exists?snap.data():null;
+    if(remote&&(remote.updatedAt||0)>(S.data.updatedAt||0)){
+      S.data=Object.assign(def(),JSON.parse(JSON.stringify(remote)));
+      try{localStorage.setItem(LS,JSON.stringify(S.data));}catch(e){}
+      if(!S.sess) render();
+    }else if(!remote||(remote.updatedAt||0)<(S.data.updatedAt||0)){ if(S.data.updatedAt) flush(); }
+    S.sync='cloud'; renderSync();
+  }catch(e){}
+}
+async function initCloud(){
+  if(!window.claude||!window.claude.use) return;
+  try{
+    const [db,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);
+    if(!db||!user) return;
+    const uid=await user.id();
+    if(!uid) return;
+    S.ref=db.doc('data/users/'+uid+'/progress');
+    await pullRemote();
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') pullRemote(); });
+
+/* ---------- утилиты ---------- */
+const $=s=>document.querySelector(s);
+const dk=(d=new Date())=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const stage=()=>STAGES[S.data.stage-1];
+const learned=()=>STAGES.slice(0,S.data.stage).flatMap(s=>s.chords);
+const pairKey=p=>p.join('-');
+function weekDays(){
+  const now=new Date(); const mon=new Date(now); mon.setDate(now.getDate()-((now.getDay()+6)%7));
+  return Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d;});
+}
+function dayDone(k){const d=S.data.days[k];return !!d&&((d.g||0)+(d.t||0))>0;}
+function logDay(kind,min){
+  const k=dk(); const d=S.data.days[k]||(S.data.days[k]={g:0,t:0});
+  d[kind]=(d[kind]||0)+min; save();
+}
+function bestChanges(p){const h=S.data.changes[pairKey(p)]||[];return h.reduce((m,x)=>Math.max(m,x.n),0);}
+let toastT=null;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2600);}
+function plural(n,a,b,c){const m=n%10,h=n%100;if(m===1&&h!==11)return a;if(m>=2&&m<=4&&(h<12||h>14))return b;return c;}
+
+/* ---------- звук: щипковая струна (Karplus–Strong) и метроном ---------- */
+let ctx=null; const bufCache={};
+function ac(){ if(!ctx){const C=window.AudioContext||window.webkitAudioContext; if(!C) return null; ctx=new C();} if(ctx.state==='suspended') ctx.resume(); return ctx; }
+function pluckBuf(freq){
+  const key=freq.toFixed(2); if(bufCache[key]) return bufCache[key];
+  const sr=ctx.sampleRate,len=Math.floor(sr*2.4),N=Math.max(2,Math.round(sr/freq));
+  const buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
+  let prev=0; for(let i=0;i<N;i++){const r=Math.random()*2-1;prev=prev*0.5+r*0.5;d[i]=prev;}
+  const decay=freq>250?0.994:0.997;
+  for(let i=N;i<len;i++) d[i]=decay*0.5*(d[i-N]+d[i-N+1]);
+  return bufCache[key]=buf;
+}
+function note(freq,when=0,vol=0.35){
+  if(!ac()) return;
+  const src=ctx.createBufferSource(); src.buffer=pluckBuf(freq);
+  const g=ctx.createGain(); g.gain.value=vol; src.connect(g).connect(ctx.destination);
+  src.start(ctx.currentTime+when);
+}
+function strum(name,up=false){
+  const c=CHORDS[name]; if(!c||!ac()) return;
+  const idx=up?[5,4,3,2,1,0]:[0,1,2,3,4,5]; let k=0;
+  idx.forEach(i=>{const f=c.f[i]; if(f<0) return; note(OPEN[i]*Math.pow(2,f/12),k*0.022,0.22); k++;});
+}
+function click(t,accent){
+  const o=ctx.createOscillator(),g=ctx.createGain();
+  o.frequency.value=accent?1500:1000; g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(accent?0.5:0.3,t+0.002); g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+  o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+0.06);
+}
+function chime(){ if(!ac()) return; note(659.25,0,0.25); note(987.77,0.12,0.25); }
+const Metro={on:false,bpm:70,i:0,next:0,timer:null,cb:null,
+  start(){ if(!ac()) return; this.on=true; this.i=0; this.next=ctx.currentTime+0.12; this.timer=setInterval(()=>this.sched(),25); },
+  stop(){ this.on=false; clearInterval(this.timer); this.timer=null; },
+  toggle(){ this.on?this.stop():this.start(); },
+  sched(){
+    while(this.next<ctx.currentTime+0.1){
+      const i=this.i,t=this.next;
+      if(i%2===0) click(t,i%8===0);
+      setTimeout(()=>{ if(this.on&&this.cb) this.cb(i); },Math.max(0,(t-ctx.currentTime)*1000));
+      this.next+=60/this.bpm/2; this.i++;
+    }
+  }
+};
+
+/* ---------- рисунки ---------- */
+function chordSVG(name,cls=''){
+  const c=CHORDS[name],W=112,H=132,x0=18,dx=15.2,y0=30,dy=24,F=4;
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="cd ${cls}" role="img" aria-label="Схема аккорда ${name}">`;
+  for(let f=0;f<=F;f++){const y=y0+f*dy;s+=`<line x1="${x0}" y1="${y}" x2="${x0+5*dx}" y2="${y}" class="${f===0?'nut':'fr'}"/>`;}
+  for(let i=0;i<6;i++){
+    const x=x0+i*dx,f=c.f[i];
+    s+=`<line x1="${x}" y1="${y0}" x2="${x}" y2="${y0+F*dy}" class="st" stroke-width="${(1.9-i*0.22).toFixed(2)}"/>`;
+    if(f<0) s+=`<text x="${x}" y="${y0-8}" class="mk">×</text>`;
+    else if(f===0) s+=`<circle cx="${x}" cy="${y0-12}" r="4" class="op"/>`;
+    else {const y=y0+(f-0.5)*dy;s+=`<circle cx="${x}" cy="${y}" r="7" class="dot"/><text x="${x}" y="${y+3.3}" class="fg">${c.fg[i]||''}</text>`;}
+  }
+  return s+'</svg>';
+}
+function boardSVG(si,fret,maxF=7){
+  const W=340,H=150,x0=40,fw=(W-x0-12)/maxF,y0=18,sy=20;
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="board" role="img" aria-label="Гриф с отмеченной нотой">`;
+  [3,5,7].filter(f=>f<=maxF).forEach(f=>s+=`<circle cx="${x0+(f-0.5)*fw}" cy="${y0+2.5*sy}" r="5" class="inl"/>`);
+  for(let k=1;k<=maxF;k++){const x=x0+k*fw;s+=`<line x1="${x}" y1="${y0}" x2="${x}" y2="${y0+5*sy}" class="frl"/><text x="${x-fw/2}" y="${y0+5*sy+20}" class="lab">${k}</text>`;}
+  s+=`<line x1="${x0}" y1="${y0-2}" x2="${x0}" y2="${y0+5*sy+2}" class="nutl"/>`;
+  for(let r=0;r<6;r++){const i=5-r,y=y0+r*sy;
+    s+=`<line x1="${x0}" y1="${y}" x2="${W-12}" y2="${y}" class="str" stroke-width="${(0.8+i*0.0+ (5-i)*0.25).toFixed(2)}"/>`;
+    s+=`<text x="12" y="${y+4}" class="lab">${r===0?'e':STR[i]}</text>`;
+  }
+  const y=y0+(5-si)*sy, x=fret===0?x0-14:x0+(fret-0.5)*fw;
+  s+=`<circle cx="${x}" cy="${y}" r="8" class="hit"/>`;
+  return s+'</svg>';
+}
+const ICONS={
+  today:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>',
+  path:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8 16.5c4-1 2-8 8-9"/></svg>',
+  chords:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 4v16M9.5 4v16M14 4v16M18.5 4v16M4 8h16"/><circle cx="9.5" cy="12" r="1.8" fill="currentColor"/><circle cx="14" cy="16" r="1.8" fill="currentColor"/></svg>',
+  tools:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8l-2.5-17h-3z"/><path d="M12 15l5-8"/></svg>'
+};
+
+/* ---------- экраны ---------- */
+function renderSync(){
+  const el=$('#sync'); el.className='sync'+(S.sync==='cloud'?' cloud':'');
+  el.querySelector('span').textContent=S.sync==='cloud'?'синхронизировано':'на этом устройстве';
+}
+function renderTabs(){
+  const T=[['today','Сегодня'],['path','Путь'],['chords','Аккорды'],['tools','Инструменты']];
+  $('#tabs').innerHTML=T.map(([k,n])=>`<button data-a="nav" data-v="${k}" class="${S.view===k?'on':''}" aria-current="${S.view===k}">${ICONS[k]}<span>${n}</span></button>`).join('');
+}
+function weekHTML(){
+  const days=weekDays(),today=dk(),names=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const done=days.filter(d=>dayDone(dk(d))).length;
+  return `<section class="stack">
+    <div class="week-line"><div><span class="label">Эта неделя</span><div><b>${done}</b> <span class="muted">из ${S.data.goal} ${plural(S.data.goal,'шага','шагов','шагов')}</span></div></div>
+    <span class="muted" style="font-size:13px">${done>=S.data.goal?'Цель недели есть. Всё сверху — бонус.':'Пропуски не сгорают, это цель на неделю.'}</span></div>
+    <div class="neck" aria-label="Дни практики на этой неделе">
+      <div class="neck-frets">${days.map(d=>{const k=dk(d);return `<div class="fret"><span class="inlay ${dayDone(k)?'on':''} ${k===today&&!dayDone(k)?'today':''}"></span></div>`;}).join('')}</div>
+      <div class="neck-days">${days.map((d,i)=>`<span class="${dk(d)===today?'t':''}">${names[i]}</span>`).join('')}</div>
+    </div></section>`;
+}
+function todayHTML(){
+  const st=stage(),g=S.data.mode==='guitar',todayDone=dayDone(dk());
+  const newC=st.chords.join(', ');
+  const plan=g?[
+      ['Разминка: '+WARM[st.warm].t.toLowerCase(),'2 мин'],
+      ['Аккорд '+newC+(S.data.stage>1?' + повторение':''),'1,5 мин'],
+      ['Минута смен '+(st.pair[0]===st.pair[1]?st.pair[0]:st.pair.join(' ↔ ')),'1 мин'],
+      ['Ритм: '+PATS[st.pat].name.toLowerCase(),'2 мин'],
+      ['Играем по кругу: '+st.prog.join(' – '),'3 мин']]
+    :[['Микро-урок','1 мин'],['8 быстрых вопросов: струны, ноты, аккорды, на слух','2 мин']];
+  return `<div class="stack" style="gap:18px">
+    ${weekHTML()}
+    <div class="anchor"><span class="muted">Мой момент:</span><input id="anchor" maxlength="60" placeholder="например, после утреннего кофе" value="${(S.data.anchor||'').replace(/"/g,'&quot;')}"></div>
+    <div class="seg" role="tablist">
+      <button data-a="mode" data-v="guitar" class="${g?'on':''}">Гитара рядом<small>10 минут практики</small></button>
+      <button data-a="mode" data-v="theory" class="${!g?'on':''}">В дороге<small>3 минуты теории</small></button>
+    </div>
+    ${todayDone?`<p class="done-note">Сегодня шаг уже засчитан. Можно отдыхать или повторить, если хочется.</p>`:''}
+    <section class="card stack">
+      <div><span class="label">Этап ${S.data.stage} из ${STAGES.length}</span><h2>${st.title}</h2></div>
+      <ul class="plan">${plan.map(p=>`<li><span>${p[0]}</span><span>${p[1]}</span></li>`).join('')}</ul>
+      <div class="btns">${g
+        ?`<button class="btn" data-a="start" data-v="guitar">Начать · 10 мин</button><button class="btn ghost" data-a="start" data-v="short">Есть только 2 минуты</button>`
+        :`<button class="btn" data-a="start" data-v="theory">Начать · 3 мин</button>`}</div>
+    </section>
+    <details class="how card"><summary>Как это работает</summary>
+      <ol>
+        <li><b>Один шаг в день, минимум 2 минуты.</b> Регулярность важнее длительности.</li>
+        <li><b>Цель — ${S.data.goal} ${plural(S.data.goal,'день','дня','дней')} в неделю</b>, а не каждый день. Пропустил — ничего не сгорает.</li>
+        <li><b>Гитара рядом</b> — 10 минут из пяти коротких упражнений. <b>Нет гитары</b> (дорога, очередь) — 3 минуты теории с телефона.</li>
+        <li>Привяжи шаг к тому, что уже делаешь каждый день: впиши свой момент выше.</li>
+        <li>Главная цифра прогресса — <b>смены аккордов за минуту</b>. ${CHANGE_GOAL}+ — этап освоен, предложу следующий. Переходить можно и раньше, во вкладке «Путь».</li>
+        <li>Прогресс хранится в твоём аккаунте Claude: открывай эту же ссылку с телефона и с ноутбука.</li>
+      </ol>
+    </details>
+  </div>`;
+}
+function pathHTML(){
+  const st=stage(),pk=pairKey(st.pair),hist=(S.data.changes[pk]||[]).slice(-14);
+  const allDays=Object.values(S.data.days).filter(d=>(d.g||0)+(d.t||0)>0).length;
+  const mins=Object.values(S.data.days).reduce((m,d)=>m+(d.g||0)+(d.t||0),0);
+  const acc=S.data.quiz.total?Math.round(S.data.quiz.ok/S.data.quiz.total*100)+'%':'—';
+  const max=Math.max(CHANGE_GOAL+5,...hist.map(h=>h.n)); const best=bestChanges(st.pair);
+  const ready=best>=CHANGE_GOAL&&S.data.stage<STAGES.length;
+  return `<div class="stack" style="gap:18px">
+    <div class="stats">
+      <div class="stat"><b class="mono">${allDays}</b><span>${plural(allDays,'день','дня','дней')} с гитарой</span></div>
+      <div class="stat"><b class="mono">${mins}</b><span>минут всего</span></div>
+      <div class="stat"><b class="mono">${acc}</b><span>верных ответов</span></div>
+    </div>
+    <section class="card stack">
+      <div class="row" style="justify-content:space-between"><div><span class="label">Смены за минуту</span><h3>${st.pair[0]===st.pair[1]?'Поставить '+st.pair[0]+' заново':st.pair.join(' ↔ ')}</h3></div><span class="pill acc">рекорд ${best}</span></div>
+      ${hist.length?`<div class="bars goalline" style="--g:${CHANGE_GOAL/max*100}%">${hist.map(h=>`<div class="${h.n===best?'best':''}" style="height:${h.n/max*100}%" title="${h.d}: ${h.n}"></div>`).join('')}</div>
+      <p class="muted" style="font-size:13px">Пунктир — ${CHANGE_GOAL} смен, отметка «этап освоен».</p>`
+      :`<p class="muted">Пока нет попыток. Минута смен — третье упражнение в тренировке с гитарой.</p>`}
+      ${ready?`<button class="btn" data-a="stage" data-v="${S.data.stage+1}">Этап освоен — перейти к «${STAGES[S.data.stage].title}»</button>`:''}
+    </section>
+    <section class="stages">${STAGES.map((s,i)=>{const n=i+1,cls=n<S.data.stage?'past':n===S.data.stage?'cur':'';
+      return `<div class="stage ${cls}"><span class="num">${n}</span><div><div class="row" style="justify-content:space-between"><span class="t">${s.title}</span>${n===S.data.stage?'<span class="pill acc">сейчас</span>':`<button class="btn ghost small" data-a="stage" data-v="${n}">${n<S.data.stage?'Вернуться':'Перейти'}</button>`}</div>
+      <div class="chips">${s.chords.map(c=>`<span>${c}</span>`).join('')}<span>${s.prog.join('–')}</span></div></div></div>`;}).join('')}</section>
+  </div>`;
+}
+function chordsHTML(){
+  const L=learned();
+  return `<div class="stack"><p class="muted">Нажми на аккорд, чтобы услышать. Подсвечены те, что уже пройдены.</p>
+  <div class="chords">${Object.keys(CHORDS).map(n=>`<button class="chord ${L.includes(n)?'':'locked'}" data-a="play" data-v="${n}">${chordSVG(n)}<span class="nm">${n}</span><span class="ru">${CHORDS[n].ru}</span></button>`).join('')}</div></div>`;
+}
+function toolsHTML(){
+  return `<div class="stack" style="gap:18px">
+    <section class="card stack"><div><span class="label">Настройка на слух</span><h2>Эталонные струны</h2></div>
+      <p class="muted" style="font-size:14px">Нажми струну — прозвучит эталон. Крути колок, пока звук гитары не «сольётся» с эталоном. Точнее и быстрее — бесплатным приложением-тюнером на телефоне (эта страница не может слушать микрофон).</p>
+      <div class="strings">${[0,1,2,3,4,5].map(i=>`<button data-a="string" data-v="${i}"><b>${i===5?'e':STR[i]}</b><small>${6-i}-я</small></button>`).join('')}</div>
+    </section>
+    <section class="card stack"><div><span class="label">Метроном</span><h2>Ровный ритм</h2></div>
+      ${metroHTML()}
+      <div class="beats" id="beats"><i></i><i></i><i></i><i></i></div>
+    </section>
+    <section class="card stack"><div><span class="label">Настройки</span><h2>Цель недели</h2></div>
+      <div class="goals">${[3,4,5,7].map(n=>`<button data-a="goal" data-v="${n}" class="${S.data.goal===n?'on':''}">${n}</button>`).join('')}</div>
+      <p class="muted" style="font-size:14px">Сколько дней в неделю хочешь заниматься. Для начала хватит 3–4.</p>
+      ${S.confirmReset?`<div class="confirm stack"><p>Стереть весь прогресс на всех устройствах? Это нельзя отменить.</p><div class="btns"><button class="btn" style="background:var(--bad)" data-a="reset-yes">Да, стереть</button><button class="btn ghost" data-a="reset-no">Оставить</button></div></div>`
+      :`<button class="danger" style="align-self:flex-start;font-weight:700" data-a="reset-ask">Начать заново…</button>`}
+    </section>
+  </div>`;
+}
+function metroHTML(){
+  return `<div class="metro"><button class="btn small" data-a="metro" id="metroBtn">${Metro.on?'Стоп':'Метроном'}</button>
+  <button class="rbtn" data-a="bpm" data-v="-5" aria-label="Медленнее">−</button><span class="bpm" id="bpmv">${Metro.bpm}</span><button class="rbtn" data-a="bpm" data-v="5" aria-label="Быстрее">+</button><span class="muted" style="font-size:13px">уд/мин</span></div>`;
+}
+function render(){
+  renderTabs(); renderSync();
+  const v={today:todayHTML,path:pathHTML,chords:chordsHTML,tools:toolsHTML}[S.view]();
+  $('#view').innerHTML=v;
+  Metro.cb=S.view==='tools'?toolsTick:null;
+}
+function toolsTick(i){ if(i%2) return; const b=(i/2)%4; document.querySelectorAll('#beats i').forEach((el,k)=>el.classList.toggle('on',k===b)); }
+
+/* ---------- сессия с гитарой ---------- */
+function startGuitar(short){
+  const st=stage(),newC=st.chords[st.chords.length-1];
+  const prev=learned().filter(c=>!st.chords.includes(c));
+  const steps=[];
+  if(!short) steps.push({k:'warm',title:'Разминка',sec:120});
+  steps.push({k:'chord',title:'Аккорд '+newC,chord:newC,review:prev.length?pick(prev):null,sec:short?45:90});
+  steps.push({k:'changes',title:'Минута смен',sec:60,state:'idle',n:0});
+  if(!short){steps.push({k:'strum',title:'Ритм',sec:120});steps.push({k:'play',title:'Играем по кругу',sec:180});}
+  steps.push({k:'done',title:'Готово'});
+  Metro.bpm=st.bpm;
+  openSession({type:'guitar',steps});
+}
+function openSession(s){
+  ac(); s.i=0; s.start=Date.now(); s.logged=false; S.sess=s; enterStep(); $('#session').hidden=false; document.body.style.overflow='hidden';
+}
+function enterStep(){ const s=S.sess,st=s.steps[s.i]; Metro.stop(); st.t0=Date.now(); st.chimed=false; s.bar=0; s.picked=null; renderSession(); }
+function closeSession(){
+  const s=S.sess; if(!s) return; Metro.stop();
+  if(!s.logged){const min=Math.round((Date.now()-s.start)/60000); if(Date.now()-s.start>=60000){logDay(s.type==='guitar'?'g':'t',Math.max(1,min));toast('Засчитано: '+Math.max(1,min)+' мин. Даже немного — это шаг.');}}
+  S.sess=null; $('#session').hidden=true; $('#session').innerHTML=''; document.body.style.overflow=''; render();
+}
+function finishLog(){
+  const s=S.sess; if(s.logged) return;
+  s.minutes=Math.max(1,Math.round((Date.now()-s.start)/60000)); s.logged=true;
+  logDay(s.type==='guitar'?'g':'t',s.minutes);
+}
+function sessHead(){
+  const s=S.sess,n=s.steps.length;
+  return `<div class="shead"><button class="x" data-a="sess-close" aria-label="Закрыть">×</button>
+    <div class="prog">${s.steps.map((_,k)=>`<i class="${k<=s.i?'on':''}"></i>`).join('')}</div>
+    <span class="mono muted" style="font-size:13px">${Math.min(s.i+1,n)}/${n}</span></div>`;
+}
+function timerHTML(st){ return st.sec&&st.k!=='changes'?`<div class="timer" aria-hidden="true"><i id="tbar"></i></div>`:''; }
+function nextBtn(label='Дальше'){ return `<button class="btn" data-a="sess-next">${label}</button>`; }
+function patternHTML(p){
+  const cnt=['1','и','2','и','3','и','4','и'];
+  return `<div class="pattern">${p.s.split('').map((c,k)=>`<div data-slot="${k}" class="${c==='-'?'rest':''}"><b>${c==='D'?'↓':c==='U'?'↑':c==='X'?'×':'·'}</b><small>${cnt[k]}</small></div>`).join('')}</div>`;
+}
+function renderSession(){
+  const s=S.sess; if(!s) return;
+  const st=s.steps[s.i]; let body='';
+  if(s.type==='theory'){ body=theoryBody(st); }
+  else if(st.k==='warm'){
+    const w=WARM[stage().warm];
+    body=`<div><span class="label">Разминка · 2 мин</span><h2>${w.t}</h2></div>${timerHTML(st)}
+      <p>${w.b}</p>${w.tab?`<div class="tab">${w.tab}</div>`:''}
+      ${metroHTML()}${nextBtn()}`;
+  }else if(st.k==='chord'){
+    const c=CHORDS[st.chord];
+    body=`<div><span class="label">Аккорд дня</span><h2>${st.chord} — ${c.ru}</h2></div>${timerHTML(st)}
+      <div class="pair"><div>${chordSVG(st.chord,'cd-l')}<button class="btn ghost small" data-a="play" data-v="${st.chord}">Послушать</button></div>
+      ${st.review?`<div><span class="label">Повторение</span>${chordSVG(st.review)}<button class="btn ghost small" data-a="play" data-v="${st.review}">${st.review}</button></div>`:''}</div>
+      <ol class="steps"><li>Поставь пальцы по схеме, большой палец — за грифом.</li><li>Проведи по струнам медленно, по одной. Дребезжит — прижми ближе к ладу.</li><li>Сними руку, встряхни, поставь снова. ${st.review?'Потом то же с '+st.review+'. ':''}Повторяй до конца полоски.</li></ol>
+      ${nextBtn()}`;
+  }else if(st.k==='changes'){
+    const p=stage().pair,same=p[0]===p[1],best=bestChanges(p);
+    const what=same?`Поставь ${p[0]} — убери руку — поставь снова. Считай постановки.`:`Переставляй ${p[0]} → ${p[1]} → ${p[0]}… Каждый переход — одна смена. Ударь по струнам после каждой.`;
+    if(st.state==='idle') body=`<div><span class="label">Минута смен</span><h2>${same?p[0]+' заново':p.join(' ↔ ')}</h2></div>
+      <div class="pair">${[...new Set(p)].map(c=>`<div>${chordSVG(c)}<b>${c}</b></div>`).join('')}</div>
+      <p>${what} Нажимай большую кнопку на каждую смену (или ставь телефон рядом и считай вслух, а число введёшь в конце).</p>
+      <p class="muted">Рекорд: <b class="mono">${best}</b> · цель этапа: <b class="mono">${CHANGE_GOAL}</b></p>
+      <button class="btn" data-a="ch-start">Старт — 60 секунд</button><button class="btn ghost" data-a="sess-next">Пропустить</button>`;
+    else if(st.state==='run') body=`<div class="row" style="justify-content:space-between"><span class="label">Идёт минута</span><span class="mono" id="chleft" style="font-size:20px;font-weight:600">60</span></div>
+      <div class="big mono" id="chn">${st.n}</div>
+      <button class="tap" data-a="ch-tap">+1 смена</button>
+      <p class="muted" style="text-align:center">Пробел на клавиатуре тоже считает.</p>`;
+    else { const rec=st.n>=best&&st.n>0;
+      body=`<div><span class="label">Результат</span><h2>${st.n} ${plural(st.n,'смена','смены','смен')} за минуту</h2></div>
+      <div class="row"><button class="rbtn" data-a="ch-adj" data-v="-1" aria-label="Минус один">−</button><span class="big mono" style="font-size:40px">${st.n}</span><button class="rbtn" data-a="ch-adj" data-v="1" aria-label="Плюс один">+</button><span class="muted" style="font-size:13px">поправь, если считал вслух</span></div>
+      <p>${rec?'Новый рекорд!':'Рекорд пока '+best+'.'} ${st.n>=CHANGE_GOAL?'Это уровень «этап освоен».':'До цели этапа — '+Math.max(0,CHANGE_GOAL-st.n)+'. Скорость приходит сама за несколько дней.'}</p>
+      ${nextBtn('Сохранить и дальше')}`; }
+  }else if(st.k==='strum'){
+    const stg=stage(),p=PATS[stg.pat],c=stg.chords[stg.chords.length-1];
+    body=`<div><span class="label">Ритм · 2 мин</span><h2>${p.name}</h2></div>${timerHTML(st)}
+      ${patternHTML(p)}
+      <p>Зажми <b>${c}</b>. Рука качается всё время: вниз на цифры, вверх на «и». На серых точках рука проходит мимо струн.${p.s.includes('X')?' × — удар вниз с глушением ребром ладони.':''}</p>
+      ${metroHTML()}${nextBtn()}`;
+  }else if(st.k==='play'){
+    const stg=stage(),cur=stg.prog[s.bar%stg.prog.length];
+    body=`<div><span class="label">Играем по кругу · 3 мин</span><h2>${stg.prog.join(' – ')}</h2></div>${timerHTML(st)}
+      <div class="progc" id="progc">${stg.prog.map((c,k)=>`<span class="${k===s.bar%stg.prog.length?'on':''}">${c}</span>`).join('')}</div>
+      <div class="pair"><div id="playcur">${chordSVG(cur,'cd-l')}</div></div>
+      <p>Один аккорд — один такт (4 щелчка), бой «${PATS[stg.pat].name.toLowerCase()}». Не успеваешь переставить — играй только первый удар такта, это нормально.</p>
+      ${metroHTML()}
+      <label class="row" style="font-size:14px"><input type="checkbox" id="sndalong" ${s.along?'checked':''}> Подыгрывать звуком аккорда</label>
+      ${nextBtn()}`;
+  }else if(st.k==='done'){
+    finishLog();
+    const stg=stage(),best=bestChanges(stg.pair),ready=best>=CHANGE_GOAL&&S.data.stage<STAGES.length;
+    body=`<div class="stack" style="text-align:center;align-items:center;padding-top:10px">
+      <span class="label">Шаг засчитан</span><div class="big">${s.minutes} мин</div>
+      <p>${pick(['Пальцы запоминают, даже когда кажется, что ничего не получается.','Каждая минута — это кирпичик. Завтра будет чуть легче.','Готово. Вот так и становятся гитаристами — понемногу.'])}</p></div>
+      <div class="stack"><span class="label">Как шло?</span><div class="feel">${['Легко','Нормально','Тяжело'].map(f=>`<button data-a="feel" data-v="${f}" class="${s.feel===f?'on':''}">${f}</button>`).join('')}</div>
+      ${s.feel==='Легко'&&!ready&&S.data.stage<STAGES.length?'<p class="muted" style="font-size:14px">Можно прибавить 5 уд/мин метронома в следующий раз — или перейти к следующему этапу во вкладке «Путь».</p>':''}
+      ${s.feel==='Тяжело'?'<p class="muted" style="font-size:14px">Это нормально. Завтра попробуй «Есть только 2 минуты» — короткий шаг тоже шаг.</p>':''}</div>
+      ${ready?`<button class="btn" data-a="stage-close" data-v="${S.data.stage+1}">Этап освоен — открыть «${STAGES[S.data.stage].title}»</button>`:''}
+      <button class="btn ${ready?'ghost':''}" data-a="sess-close">Закрыть</button>`;
+  }
+  $('#session').innerHTML=`<div class="wrap">${sessHead()}${body}</div>`;
+  Metro.cb=sessTick;
+}
+function sessTick(i){
+  const s=S.sess; if(!s) return; const st=s.steps[s.i];
+  if(st.k==='strum'||st.k==='warm'){ const k=i%8; document.querySelectorAll('[data-slot]').forEach(el=>el.classList.toggle('on',+el.dataset.slot===k)); }
+  if(st.k==='play'&&i%8===0){
+    const prog=stage().prog; s.bar=Math.floor(i/8);
+    const b=s.bar%prog.length, c=prog[b];
+    const el=$('#playcur'); if(el) el.innerHTML=chordSVG(c,'cd-l');
+    document.querySelectorAll('#progc span').forEach((x,k)=>x.classList.toggle('on',k===b));
+    if(s.along) strum(c);
+  }
+}
+setInterval(()=>{
+  const s=S.sess; if(!s) return; const st=s.steps[s.i]; if(!st) return;
+  if(st.k==='changes'&&st.state==='run'){
+    const left=Math.max(0,60-(Date.now()-st.run0)/1000); const el=$('#chleft'); if(el) el.textContent=Math.ceil(left);
+    if(left<=0){st.state='end';chime();renderSession();}
+    return;
+  }
+  if(st.sec&&st.t0){ const p=Math.min(1,(Date.now()-st.t0)/1000/st.sec); const b=$('#tbar'); if(b) b.style.width=(p*100)+'%';
+    if(p>=1&&!st.chimed){st.chimed=true;chime();} }
+},250);
+
+/* ---------- сессия теории ---------- */
+function makeQuestion(kind){
+  const n=S.data.stage;
+  if(kind==='string'){
+    const num=1+Math.floor(Math.random()*6),i=6-num,a=STR[i];
+    return {prompt:`Как называется ${num}-я струна${num===1?' (самая тонкая)':num===6?' (самая толстая)':''}?`,opts:shuffle(['E','A','D','G','B']).slice(0,4).concat([]).filter((x,k,arr)=>arr.indexOf(x)===k),ans:a,explain:`${num}-я струна — ${a} (${RU[a]}). По порядку с 6-й: E A D G B E.`,fix:true};
+  }
+  if(kind==='fret'){
+    const strs=n>=6?[0,1,2]:[0,1],si=pick(strs),maxF=n>=5?7:5,fret=Math.floor(Math.random()*(maxF+1));
+    const a=NOTES[(OPEN_IDX[si]+fret)%12];
+    return {prompt:`Какая нота отмечена? ${6-si}-я струна, ${fret===0?'открытая':fret+'-й лад'}.`,visual:boardSVG(si,fret,7),opts:null,ans:a,pool:NOTES,explain:`Это ${a} (${RU[a]}). Считай от открытой ${STR[si]}: каждый лад — шаг, диеза нет между B–C и E–F.`};
+  }
+  if(kind==='chord'){
+    const L=learned(),c=pick(L),pool=Object.keys(CHORDS);
+    return {prompt:'Что это за аккорд?',visual:`<div class="pair"><div>${chordSVG(c,'cd-l')}</div></div>`,opts:null,ans:c,pool:L.length>=4?L:pool,explain:`Это ${c} — ${CHORDS[c].ru}.`,after:()=>strum(c)};
+  }
+  if(kind==='ear'){
+    const L=learned().filter(c=>CHORDS[c].t!=='5'),c=pick(L.length>2?L:['Em','Am','E','D','A','G','C','Dm']);
+    const a=CHORDS[c].t==='maj'?'Мажор — светло':'Минор — грустно';
+    return {prompt:'Послушай. Мажор или минор?',visual:`<button class="btn ghost" data-a="replay">Сыграть ещё раз</button>`,opts:['Мажор — светло','Минор — грустно'],ans:a,explain:`Звучал ${c} — ${CHORDS[c].ru}.`,play:()=>strum(c),fix:true};
+  }
+  const bank=STATIC_Q.filter(q=>q.s<=n),q=pick(bank);
+  return {prompt:q.q,opts:q.o,ans:q.a,explain:'',fix:true};
+}
+function finalizeOpts(q){
+  if(q.fix){ if(!q.opts.includes(q.ans)) q.opts[q.opts.length-1]=q.ans; if(!q.opts.includes('Да')&&!q.opts[0].startsWith('Мажор')) q.opts=shuffle(q.opts); return q; }
+  const others=shuffle(q.pool.filter(x=>x!==q.ans)).slice(0,3); q.opts=shuffle([q.ans,...others]); return q;
+}
+function startTheory(){
+  const n=S.data.stage;
+  const unseen=STAGES.slice(0,n).flatMap(s=>s.lessons).find(l=>!S.data.seen.includes(l));
+  const kinds=['string','static'];
+  if(n>=2) kinds.push('fret','fret','chord','chord');
+  if(n>=3) kinds.push('ear','ear');
+  const steps=[];
+  if(unseen) steps.push({k:'lesson',id:unseen});
+  for(let k=0;k<8;k++) steps.push({k:'q',q:finalizeOpts(makeQuestion(pick(kinds)))});
+  steps.push({k:'tdone'});
+  openSession({type:'theory',steps,ok:0});
+  if(steps[0].q&&steps[0].q.play) setTimeout(()=>steps[0].q.play(),250);
+}
+function theoryBody(st){
+  const s=S.sess;
+  if(st.k==='lesson'){ const L=LESSONS[st.id];
+    return `<div><span class="label">Микро-урок</span><h2>${L.t}</h2></div><div class="lesson">${L.b}</div>${nextBtn('Понятно')}`; }
+  if(st.k==='q'){ const q=st.q,done=s.picked!=null;
+    return `<div><span class="label">Вопрос</span><h2>${q.prompt}</h2></div>${q.visual||''}
+      <div class="opts">${q.opts.map((o,k)=>{let c='';if(done){if(o===q.ans)c='ok';else if(k===s.picked)c='no';}return `<button data-a="ans" data-v="${k}" class="${c}" ${done?'disabled':''}>${o}</button>`;}).join('')}</div>
+      ${done?`<p>${q.opts[s.picked]===q.ans?'<b style="color:var(--good)">Верно.</b> ':'<b style="color:var(--bad)">Не совсем.</b> '}${q.explain}</p>${nextBtn()}`:''}`; }
+  if(st.k==='tdone'){ finishLog(); const qs=s.steps.filter(x=>x.k==='q').length;
+    return `<div class="stack" style="text-align:center;align-items:center;padding-top:10px"><span class="label">Шаг засчитан</span>
+      <div class="big">${s.ok}/${qs}</div><p>${s.ok>=qs-1?'Отлично — теория держится.':s.ok>=qs/2?'Хорошо. Ошибки — это то, что завтра запомнится лучше всего.':'Нормальный старт. Вопросы будут повторяться, пока не станут лёгкими.'}</p>
+      <p class="muted">Вечером с гитарой — открой «Гитара рядом».</p></div>
+      <button class="btn" data-a="sess-close">Закрыть</button>`; }
+  return '';
+}
+
+/* ---------- события ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]'); if(!b) return;
+  const a=b.dataset.a,v=b.dataset.v,s=S.sess;
+  switch(a){
+    case 'nav': Metro.stop(); S.view=v; S.confirmReset=false; render(); window.scrollTo(0,0); break;
+    case 'mode': S.data.mode=v; save(); render(); break;
+    case 'start': v==='theory'?startTheory():startGuitar(v==='short'); break;
+    case 'sess-close': closeSession(); break;
+    case 'sess-next': {
+      const st=s.steps[s.i];
+      if(st.k==='lesson'&&!S.data.seen.includes(st.id)){S.data.seen.push(st.id);save();}
+      if(st.k==='changes'&&st.state==='end'){const p=stage().pair,k=pairKey(p);const h=S.data.changes[k]||(S.data.changes[k]=[]);h.push({d:dk(),n:st.n});if(h.length>40)h.splice(0,h.length-40);save();}
+      s.i=Math.min(s.i+1,s.steps.length-1); enterStep(); $('#session').scrollTo(0,0);
+      const nx=s.steps[s.i]; if(nx.k==='q'&&nx.q.play) setTimeout(()=>nx.q.play(),250);
+      break; }
+    case 'ch-start': { const st=s.steps[s.i]; st.state='run'; st.n=0; st.run0=Date.now(); chime(); renderSession(); break; }
+    case 'ch-tap': { const st=s.steps[s.i]; st.n++; const el=$('#chn'); if(el) el.textContent=st.n; break; }
+    case 'ch-adj': { const st=s.steps[s.i]; st.n=Math.max(0,st.n+(+v)); renderSession(); break; }
+    case 'metro': Metro.toggle(); b.textContent=Metro.on?'Стоп':'Метроном'; break;
+    case 'bpm': Metro.bpm=Math.min(160,Math.max(40,Metro.bpm+(+v))); $('#bpmv').textContent=Metro.bpm; break;
+    case 'play': strum(v); break;
+    case 'string': { if(!ac()) break; const i=+v,f=OPEN[i]; note(f,0,0.4); note(f,1.1,0.4); note(f,2.2,0.4);
+      b.classList.add('on'); setTimeout(()=>b.classList.remove('on'),3000); break; }
+    case 'goal': S.data.goal=+v; save(); render(); break;
+    case 'reset-ask': S.confirmReset=true; render(); break;
+    case 'reset-no': S.confirmReset=false; render(); break;
+    case 'reset-yes': S.data=def(); S.confirmReset=false; save(); render(); toast('Прогресс стёрт. Начинаем с первого аккорда.'); break;
+    case 'stage': S.data.stage=+v; save(); render(); toast('Этап '+v+': '+STAGES[v-1].title); break;
+    case 'stage-close': S.data.stage=+v; save(); closeSession(); toast('Открыт этап '+v+': '+STAGES[v-1].title); break;
+    case 'feel': { s.feel=v; const d=S.data.days[dk()]; if(d){d.feel=v;save();} renderSession(); break; }
+    case 'ans': { if(s.picked!=null) break; s.picked=+v; const q=s.steps[s.i].q; const ok=q.opts[s.picked]===q.ans; if(ok) s.ok++;
+      S.data.quiz.total++; if(ok) S.data.quiz.ok++; save(); if(q.after) q.after(); renderSession(); break; }
+    case 'replay': { const q=s.steps[s.i].q; if(q.play) q.play(); break; }
+  }
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='anchor'){ S.data.anchor=e.target.value.trim(); save(); toast('Запомнил: '+(S.data.anchor||'без привязки')); }
+  if(e.target.id==='sndalong'&&S.sess){ S.sess.along=e.target.checked; }
+});
+document.addEventListener('keydown',e=>{
+  const s=S.sess; if(!s) return; const st=s.steps[s.i];
+  if(e.target.closest&&e.target.closest('button,input')) return;
+  if(st.k==='changes'&&st.state==='run'&&(e.code==='Space'||e.key===' ')){ e.preventDefault(); st.n++; const el=$('#chn'); if(el) el.textContent=st.n; }
+});
+
+render();
+initCloud();
+</script>
